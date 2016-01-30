@@ -4,6 +4,7 @@ require 'webrick'
 require "json"
 require "./client_player"
 require "gosu"
+require "./message.rb"
 
 root = File.expand_path './'
 server = WEBrick::HTTPServer.new :Port => 8000, :DocumentRoot => root
@@ -23,33 +24,13 @@ def make_hash(players, id)
 end
 
 server.mount_proc '/' do |req, res|
-  puts req.body.class
-  client = ClientPlayer.new.from_json!(req.body)
-  data = JSON.parse(req.body)
-  puts "data \\/"
-  puts data.inspect
-  puts "///////////////////////////////"
-  puts client
-  puts client.inspect
-  puts client.class
-  puts "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
-  id = data["@id"].to_i
-  x = data["@x"].to_i
-  y = data["@y"].to_i
-  if players[id] != nil
-    if data["@quiting"] == "true"
-      players.delete id.to_i
-    else
-      players[id].x = x
-      players[id].y = y
-    end
-  else
-    players[id] = ClientPlayer.new
-    players[id].x = x
-    players[id].y = y
-  end
-  res.body = make_hash(players, id).to_json
-  puts players
+  req = Request.new.from_json!(req.body)
+
+  puts req.inspect
+
+  response = Response.new
+  response.allowed = false
+  res.body = response.to_json
 end
 
 server.start

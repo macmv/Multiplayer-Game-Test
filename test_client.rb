@@ -2,12 +2,15 @@
 
 require "http"
 require "json"
-require "./client_player.rb"
+require "./message.rb"
 
-player = ClientPlayer.new
+req = Request.new
+req.client = '12345'
+req.action = "move"
+req.options = {"x" => 1, "y" => 2}
 
-#j = player.to_json
+#puts req.to_json
 
-puts HTTP.post("http://localhost:8000/", :json => player)
+response = HTTP.post("http://localhost:8000/", :json => req)
 
-HTTP.post("http://localhost:8000/", :json => @player)
+puts Response.new.from_json!(response.body).inspect
